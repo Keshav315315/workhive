@@ -1,0 +1,15 @@
+{
+  "name": "taskflow",
+  "version": "1.0.0",
+  "description": "Team Task Manager - Full Stack App",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && mkdir -p ../backend/public && cp -r dist/. ../backend/public/",
+    "start": "cd backend && node server.js",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}
