@@ -11,17 +11,17 @@ import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 const STATUS_COLS = [
-  { id: 'todo',        label: 'To Do',      icon: CheckSquare,  color: '#64748b', bg: 'rgba(100,116,139,0.15)' },
-  { id: 'in-progress', label: 'In Progress', icon: Clock,        color: '#6366f1', bg: 'rgba(99,102,241,0.15)'  },
-  { id: 'review',      label: 'Review',      icon: AlertCircle,  color: '#f59e0b', bg: 'rgba(245,158,11,0.15)'  },
-  { id: 'done',        label: 'Done',        icon: CheckCircle2, color: '#10b981', bg: 'rgba(16,185,129,0.15)'  },
+  { id: 'todo',        label: 'To Do',      icon: CheckSquare,  color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
+  { id: 'in-progress', label: 'In Progress', icon: Clock,        color: '#16a34a', bg: 'rgba(22,163,74,0.1)'   },
+  { id: 'review',      label: 'Review',      icon: AlertCircle,  color: '#d97706', bg: 'rgba(245,158,11,0.1)'  },
+  { id: 'done',        label: 'Done',        icon: CheckCircle2, color: '#0d9488', bg: 'rgba(13,148,136,0.1)'  },
 ];
 
 const PRIORITY_COLORS = {
-  low:      { text: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-  medium:   { text: 'text-amber-400',   bg: 'bg-amber-400/10'   },
-  high:     { text: 'text-orange-400',  bg: 'bg-orange-400/10'  },
-  critical: { text: 'text-red-400',     bg: 'bg-red-400/10'     },
+  low:      { text: 'text-green-600',  bg: 'bg-green-500/10' },
+  medium:   { text: 'text-amber-600',  bg: 'bg-amber-500/10' },
+  high:     { text: 'text-orange-500', bg: 'bg-orange-500/10' },
+  critical: { text: 'text-red-500',   bg: 'bg-red-500/10'   },
 };
 
 /* ─── Task Card ──────────────────────────────────────────────── */
@@ -37,22 +37,22 @@ function TaskCard({ task, onDelete, onStatusChange, isAdmin, currentUserId }) {
       exit={{ opacity: 0, scale: 0.95 }}
       whileHover={{ y: -2 }}
       className={`rounded-xl p-3 group card-shine cursor-pointer task-priority-${task.priority}`}
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(99,102,241,0.1)' }}
+      style={{ background: '#f8fafc', border: '1px solid #e2e8f0', transition: 'all 0.2s ease' }}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
-        <p className={`text-sm font-medium flex-1 leading-snug ${task.status === 'done' ? 'line-through text-slate-600' : 'text-white'}`}>
+        <p className={`text-sm font-medium flex-1 leading-snug ${task.status === 'done' ? 'line-through text-slate-400' : 'text-slate-800'}`}>
           {task.title}
         </p>
         {isAdmin && (
           <button onClick={() => onDelete(task._id)}
-            className="opacity-0 group-hover:opacity-100 text-slate-700 hover:text-red-400 transition-all flex-shrink-0 w-5 h-5 flex items-center justify-center rounded">
+            className="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all flex-shrink-0 w-5 h-5 flex items-center justify-center rounded">
             <Trash2 size={12} />
           </button>
         )}
       </div>
 
       {task.description && (
-        <p className="text-xs text-slate-600 line-clamp-2 mb-2">{task.description}</p>
+        <p className="text-xs text-slate-400 line-clamp-2 mb-2">{task.description}</p>
       )}
 
       <div className="flex items-center gap-2 flex-wrap">
@@ -60,14 +60,14 @@ function TaskCard({ task, onDelete, onStatusChange, isAdmin, currentUserId }) {
           {task.priority}
         </span>
         {task.dueDate && (
-          <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-400' : 'text-slate-600'}`}>
+          <span className={`text-xs flex items-center gap-1 ${isOverdue ? 'text-red-500' : 'text-slate-400'}`}>
             <Clock size={10} />
             {format(new Date(task.dueDate), 'MMM d')}
           </span>
         )}
         {task.assignedTo && (
           <div className="ml-auto w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg,#6366f1,#f59e0b)' }}>
+            style={{ background: 'linear-gradient(135deg,#16a34a,#0d9488)' }}>
             {task.assignedTo.name?.[0]?.toUpperCase()}
           </div>
         )}
@@ -79,9 +79,9 @@ function TaskCard({ task, onDelete, onStatusChange, isAdmin, currentUserId }) {
           onChange={e => onStatusChange(task._id, e.target.value)}
           onClick={e => e.stopPropagation()}
           className="mt-2.5 w-full text-xs input-glass rounded-lg px-2 py-1.5"
-          style={{ background: '#0f0f1a' }}
+          style={{ background: '#f8fafc' }}
         >
-          {STATUS_COLS.map(s => <option key={s.id} value={s.id} style={{ background: '#0f0f1a' }}>{s.label}</option>)}
+          {STATUS_COLS.map(s => <option key={s.id} value={s.id} style={{ background: '#ffffff' }}>{s.label}</option>)}
         </select>
       )}
     </motion.div>
@@ -113,17 +113,17 @@ function AddTaskModal({ projectId, users, onClose, onAdd }) {
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ scale: 0.92, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 24 }}
         className="glass-card rounded-2xl p-6 w-full max-w-md"
-        style={{ boxShadow: '0 0 60px rgba(99,102,241,0.2), 0 20px 40px rgba(0,0,0,0.5)' }}
+        style={{ boxShadow: '0 25px 50px rgba(0,0,0,0.15), 0 0 40px rgba(22,163,74,0.1)' }}
       >
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold text-white">Add Task</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-white hover:bg-white/5 transition-all">
+          <h3 className="text-lg font-bold text-slate-900">Add Task</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all">
             <X size={17} />
           </button>
         </div>
@@ -146,7 +146,7 @@ function AddTaskModal({ projectId, users, onClose, onAdd }) {
               <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })}
                 className="input-glass w-full rounded-xl px-3 py-2.5 text-sm">
                 {['low','medium','high','critical'].map(p => (
-                  <option key={p} value={p} style={{ background: '#0f0f1a' }} className="capitalize">{p}</option>
+                  <option key={p} value={p} style={{ background: '#ffffff' }} className="capitalize">{p}</option>
                 ))}
               </select>
             </div>
@@ -154,7 +154,7 @@ function AddTaskModal({ projectId, users, onClose, onAdd }) {
               <label className={labelCls}>Status</label>
               <select value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}
                 className="input-glass w-full rounded-xl px-3 py-2.5 text-sm">
-                {STATUS_COLS.map(s => <option key={s.id} value={s.id} style={{ background: '#0f0f1a' }}>{s.label}</option>)}
+                {STATUS_COLS.map(s => <option key={s.id} value={s.id} style={{ background: '#ffffff' }}>{s.label}</option>)}
               </select>
             </div>
           </div>
@@ -163,22 +163,22 @@ function AddTaskModal({ projectId, users, onClose, onAdd }) {
             <div>
               <label className={labelCls}>Due Date</label>
               <input type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })}
-                className="input-glass w-full rounded-xl px-3 py-2.5 text-sm" style={{ colorScheme: 'dark' }} />
+                className="input-glass w-full rounded-xl px-3 py-2.5 text-sm" />
             </div>
             <div>
               <label className={labelCls}>Assign To</label>
               <select value={form.assignedTo} onChange={e => setForm({ ...form, assignedTo: e.target.value })}
                 className="input-glass w-full rounded-xl px-3 py-2.5 text-sm">
-                <option value="" style={{ background: '#0f0f1a' }}>Unassigned</option>
-                {users.map(u => <option key={u._id} value={u._id} style={{ background: '#0f0f1a' }}>{u.name}</option>)}
+                <option value="" style={{ background: '#ffffff' }}>Unassigned</option>
+                {users.map(u => <option key={u._id} value={u._id} style={{ background: '#ffffff' }}>{u.name}</option>)}
               </select>
             </div>
           </div>
 
           <div className="flex gap-3 pt-1">
             <button type="button" onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-slate-400 text-sm hover:text-white transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(99,102,241,0.15)' }}>
+              className="flex-1 py-2.5 rounded-xl text-slate-500 text-sm hover:text-slate-700 transition-all"
+              style={{ background: '#f8fafc', border: '1px solid #bbf7d0' }}>
               Cancel
             </button>
             <button type="submit" disabled={saving}
@@ -242,7 +242,7 @@ export default function ProjectDetail() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-2 border-indigo-500/25 border-t-indigo-500 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-green-500/25 border-t-green-500 rounded-full animate-spin" />
     </div>
   );
 
@@ -253,7 +253,7 @@ export default function ProjectDetail() {
     return acc;
   }, {});
 
-  const projectColor = project.color || '#6366f1';
+  const projectColor = project.color || '#16a34a';
 
   return (
     <div className="space-y-6">
@@ -261,21 +261,21 @@ export default function ProjectDetail() {
       <div className="flex items-start gap-4">
         <Link to="/projects">
           <motion.button whileHover={{ x: -2 }}
-            className="mt-1 text-slate-600 hover:text-white transition-colors">
+            className="mt-1 text-slate-400 hover:text-slate-700 transition-colors">
             <ArrowLeft size={20} />
           </motion.button>
         </Link>
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-1 flex-wrap">
             <div className="w-4 h-4 rounded-full" style={{ background: projectColor }} />
-            <h1 className="text-2xl font-bold text-white">{project.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">{project.name}</h1>
             <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${
               project.status === 'active' ? 'status-in-progress' :
               project.status === 'on-hold' ? 'status-review' : 'status-done'
             }`}>{project.status}</span>
           </div>
           {project.description && <p className="text-slate-500 text-sm">{project.description}</p>}
-          <div className="flex items-center gap-4 mt-2 text-xs text-slate-600">
+          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
             <span className="flex items-center gap-1"><Users size={11} /> {(project.members?.length || 0) + 1} members</span>
             {project.deadline && <span>Due {format(new Date(project.deadline), 'MMM d, yyyy')}</span>}
             <span>{tasks.length} tasks · {tasks.filter(t => t.status === 'done').length} done</span>
@@ -303,7 +303,7 @@ export default function ProjectDetail() {
                   style={{ background: bg }}>
                   <Icon size={14} style={{ color }} />
                 </div>
-                <span className="text-sm font-semibold text-white">{label}</span>
+                <span className="text-sm font-semibold text-slate-800">{label}</span>
                 <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-medium"
                   style={{ background: bg, color }}>
                   {tasksByStatus[colId]?.length || 0}
@@ -325,7 +325,7 @@ export default function ProjectDetail() {
                   ))}
                 </AnimatePresence>
                 {tasksByStatus[colId]?.length === 0 && (
-                  <div className="text-center py-6 text-slate-700 text-xs">
+                  <div className="text-center py-6 text-slate-300 text-xs">
                     No {label.toLowerCase()} tasks
                   </div>
                 )}
@@ -334,7 +334,7 @@ export default function ProjectDetail() {
               {user?.role === 'admin' && (
                 <button
                   onClick={() => setShowAddTask(true)}
-                  className="mt-3 w-full py-2 text-xs text-slate-700 hover:text-slate-400 flex items-center justify-center gap-1 rounded-xl hover:bg-white/5 transition-all"
+                  className="mt-3 w-full py-2 text-xs text-slate-400 hover:text-green-600 flex items-center justify-center gap-1 rounded-xl hover:bg-green-50 transition-all"
                 >
                   <Plus size={11} /> Add task
                 </button>

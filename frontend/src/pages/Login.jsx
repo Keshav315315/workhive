@@ -27,7 +27,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#050508' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#f0fdf4' }}>
       {/* Animated CSS blobs */}
       <div className="blob blob-1" />
       <div className="blob blob-2" />
@@ -48,13 +48,13 @@ export default function Login() {
           <div className="inline-flex items-center gap-3 mb-3">
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl pulse-glow"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #f59e0b)' }}
+              style={{ background: 'linear-gradient(135deg, #16a34a, #0d9488)' }}
             >
-              🐝
+              ⚡
             </div>
-            <span className="text-3xl font-bold gradient-text">WorkHive</span>
+            <span className="text-3xl font-bold gradient-text">NexTask</span>
           </div>
-          <p className="text-slate-500 text-sm tracking-wide">Where Teams Thrive</p>
+          <p className="text-slate-500 text-sm tracking-wide">Next Level Productivity</p>
         </motion.div>
 
         {/* Card */}
@@ -63,23 +63,18 @@ export default function Login() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.45, delay: 0.1 }}
           className="glass-card rounded-2xl p-8 relative"
+          style={{ boxShadow: '0 25px 50px rgba(0,0,0,0.12), 0 10px 25px rgba(22,163,74,0.1)' }}
         >
-          {/* Inner gradient wash */}
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.07) 0%, transparent 55%, rgba(245,158,11,0.04) 100%)' }}
-          />
-
           <div className="relative">
-            <h2 className="text-2xl font-bold text-white mb-1">Welcome back</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
             <p className="text-slate-500 text-sm mb-6">Sign in to your workspace</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-widest">Email</label>
+                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-widest">Email</label>
                 <div className="relative">
-                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="email"
                     value={form.email}
@@ -93,9 +88,9 @@ export default function Login() {
 
               {/* Password */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-widest">Password</label>
+                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-widest">Password</label>
                 <div className="relative">
-                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={form.password}
@@ -107,7 +102,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
@@ -121,7 +116,7 @@ export default function Login() {
                 className="btn-primary w-full rounded-xl py-3 text-white font-semibold text-sm flex items-center justify-center gap-2 mt-2"
               >
                 {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>Sign in <ArrowRight size={16} /></>
                 )}
@@ -131,7 +126,7 @@ export default function Login() {
             <div className="mt-6 text-center">
               <p className="text-slate-500 text-sm">
                 Don't have an account?{' '}
-                <Link to="/register" className="text-indigo-400 hover:text-amber-400 font-medium transition-colors duration-200">
+                <Link to="/register" className="text-green-600 hover:text-teal-600 font-medium transition-colors duration-200">
                   Create one
                 </Link>
               </p>
@@ -146,7 +141,7 @@ export default function Login() {
           transition={{ delay: 0.55 }}
           className="mt-4 glass rounded-xl p-3 text-center"
         >
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-slate-500">
             Role-based access — Admin has full control, Members collaborate
           </p>
         </motion.div>

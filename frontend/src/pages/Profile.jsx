@@ -8,11 +8,11 @@ import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg,#6366f1,#f59e0b)',
-  'linear-gradient(135deg,#ec4899,#f43f5e)',
-  'linear-gradient(135deg,#10b981,#14b8a6)',
-  'linear-gradient(135deg,#f59e0b,#f97316)',
-  'linear-gradient(135deg,#38bdf8,#3b82f6)',
+  'linear-gradient(135deg,#16a34a,#0d9488)',
+  'linear-gradient(135deg,#0d9488,#0284c7)',
+  'linear-gradient(135deg,#f59e0b,#ef4444)',
+  'linear-gradient(135deg,#8b5cf6,#ec4899)',
+  'linear-gradient(135deg,#16a34a,#f59e0b)',
 ];
 const getGradient = (name = '') => AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
 const getInitials = (name = '') => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -72,7 +72,7 @@ export default function Profile() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-2xl p-6">
 
         {/* Avatar + identity */}
-        <div className="flex items-center gap-5 mb-6 pb-6" style={{ borderBottom: '1px solid rgba(99,102,241,0.1)' }}>
+        <div className="flex items-center gap-5 mb-6 pb-6" style={{ borderBottom: '1px solid #bbf7d0' }}>
           <div
             className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold text-white flex-shrink-0 avatar-ring"
             style={{ background: getGradient(user?.name) }}
@@ -80,13 +80,13 @@ export default function Profile() {
             {getInitials(user?.name)}
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">{user?.name}</h2>
+            <h2 className="text-xl font-bold text-slate-900">{user?.name}</h2>
             <div className="flex items-center gap-1.5 mt-1.5">
               {user?.role === 'admin'
-                ? <Shield size={13} className="text-indigo-400" />
-                : <User size={13} className="text-emerald-400" />
+                ? <Shield size={13} className="text-green-600" />
+                : <User size={13} className="text-teal-600" />
               }
-              <span className={`text-sm capitalize font-medium ${user?.role === 'admin' ? 'text-indigo-400' : 'text-emerald-400'}`}>
+              <span className={`text-sm capitalize font-medium ${user?.role === 'admin' ? 'text-green-600' : 'text-teal-600'}`}>
                 {user?.role}
               </span>
             </div>
@@ -101,14 +101,14 @@ export default function Profile() {
             { icon: Calendar, label: 'Joined', value: joinedDate },
           ].map(({ icon: Icon, label, value, capitalize }) => (
             <div key={label} className="rounded-xl p-3.5 flex items-center gap-3"
-              style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.12)' }}>
+              style={{ background: 'rgba(22,163,74,0.05)', border: '1px solid rgba(22,163,74,0.12)' }}>
               <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'rgba(99,102,241,0.1)' }}>
-                <Icon size={14} className="text-indigo-400" />
+                style={{ background: 'rgba(22,163,74,0.1)' }}>
+                <Icon size={14} className="text-green-600" />
               </div>
               <div className="min-w-0">
-                <div className="text-xs text-slate-600 mb-0.5">{label}</div>
-                <div className={`text-sm font-medium text-white truncate ${capitalize ? 'capitalize' : ''}`}>{value}</div>
+                <div className="text-xs text-slate-400 mb-0.5">{label}</div>
+                <div className={`text-sm font-medium text-slate-800 truncate ${capitalize ? 'capitalize' : ''}`}>{value}</div>
               </div>
             </div>
           ))}
@@ -140,8 +140,8 @@ export default function Profile() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
         className="glass-card rounded-2xl p-6">
         <div className="flex items-center gap-2 mb-5">
-          <Lock size={15} className="text-indigo-400" />
-          <h3 className="text-white font-semibold">Change Password</h3>
+          <Lock size={15} className="text-green-600" />
+          <h3 className="text-slate-800 font-semibold">Change Password</h3>
         </div>
 
         <form onSubmit={handleChangePassword} className="space-y-4">
@@ -152,7 +152,7 @@ export default function Profile() {
                 onChange={e => setCurrentPassword(e.target.value)}
                 placeholder="Enter current password" className="input-glass w-full rounded-xl px-4 py-2.5 pr-10 text-sm" />
               <button type="button" onClick={() => setShowCurrent(v => !v)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-300 transition-colors">
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
                 {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -165,7 +165,7 @@ export default function Profile() {
                 onChange={e => setNewPassword(e.target.value)}
                 placeholder="Min. 6 characters" className="input-glass w-full rounded-xl px-4 py-2.5 pr-10 text-sm" />
               <button type="button" onClick={() => setShowNew(v => !v)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-600 hover:text-slate-300 transition-colors">
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
                 {showNew ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -178,7 +178,7 @@ export default function Profile() {
                 onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter new password" className="input-glass w-full rounded-xl px-4 py-2.5 pr-10 text-sm" />
               {confirmPassword && newPassword && (
-                <div className={`absolute right-3.5 top-1/2 -translate-y-1/2 ${confirmPassword === newPassword ? 'text-emerald-400' : 'text-red-400'}`}>
+                <div className={`absolute right-3.5 top-1/2 -translate-y-1/2 ${confirmPassword === newPassword ? 'text-green-500' : 'text-red-500'}`}>
                   <CheckCircle size={14} />
                 </div>
               )}
@@ -206,14 +206,14 @@ export default function Profile() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-white font-semibold">Sign Out</h3>
-            <p className="text-slate-600 text-xs mt-0.5">You'll be redirected to the login page.</p>
+            <h3 className="text-slate-800 font-semibold">Sign Out</h3>
+            <p className="text-slate-400 text-xs mt-0.5">You'll be redirected to the login page.</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
             onClick={() => { logout(); toast.success('Signed out'); navigate('/login'); }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-400 hover:text-red-300 text-sm font-semibold transition-all"
-            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-red-500 hover:text-red-600 text-sm font-semibold transition-all"
+            style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.2)' }}
           >
             <LogOut size={14} /> Sign Out
           </motion.button>

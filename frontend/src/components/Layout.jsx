@@ -18,11 +18,11 @@ const getNavItems = (role) => [
 const getInitials = (name = '') => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
 
 const AVATAR_GRADIENTS = [
-  'linear-gradient(135deg,#6366f1,#f59e0b)',
-  'linear-gradient(135deg,#ec4899,#f43f5e)',
-  'linear-gradient(135deg,#10b981,#14b8a6)',
-  'linear-gradient(135deg,#f59e0b,#f97316)',
-  'linear-gradient(135deg,#38bdf8,#3b82f6)',
+  'linear-gradient(135deg,#16a34a,#0d9488)',
+  'linear-gradient(135deg,#0d9488,#0284c7)',
+  'linear-gradient(135deg,#f59e0b,#ef4444)',
+  'linear-gradient(135deg,#8b5cf6,#ec4899)',
+  'linear-gradient(135deg,#16a34a,#f59e0b)',
 ];
 const getAvatarGrad = (name = '') => AVATAR_GRADIENTS[name.charCodeAt(0) % AVATAR_GRADIENTS.length];
 
@@ -42,10 +42,10 @@ export default function Layout({ children }) {
   const currentNav = navItems.find(n =>
     location.pathname === n.path || (n.path !== '/dashboard' && location.pathname.startsWith(n.path))
   );
-  const pageTitle = location.pathname === '/profile' ? 'Profile' : (currentNav?.label || 'WorkHive');
+  const pageTitle = location.pathname === '/profile' ? 'Profile' : (currentNav?.label || 'NexTask');
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#050508' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#f0fdf4' }}>
       {/* Background orbs */}
       <div className="orb orb-1" />
       <div className="orb orb-2" />
@@ -55,7 +55,7 @@ export default function Layout({ children }) {
         {sidebarOpen && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 z-20 lg:hidden backdrop-blur-sm"
+            className="fixed inset-0 bg-black/30 z-20 lg:hidden backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -69,35 +69,35 @@ export default function Layout({ children }) {
         style={{
           width: '260px',
           minWidth: '260px',
-          background: '#0a0a16',
-          borderRight: '1px solid rgba(99,102,241,0.15)',
+          background: '#ffffff',
+          borderRight: '1px solid #bbf7d0',
           transition: 'transform 0.3s ease',
-          boxShadow: '4px 0 30px rgba(0,0,0,0.4)'
+          boxShadow: '4px 0 20px rgba(22,163,74,0.08)'
         }}
       >
         {/* Logo */}
-        <div className="p-5 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(99,102,241,0.12)' }}>
+        <div className="p-5 flex items-center gap-3" style={{ borderBottom: '1px solid #bbf7d0' }}>
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0 pulse-glow"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #f59e0b)' }}
+            style={{ background: 'linear-gradient(135deg, #16a34a, #0d9488)' }}
           >
-            🐝
+            ⚡
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-lg font-bold gradient-text leading-tight">WorkHive</div>
-            <div className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
-              {user?.role === 'admin' && <Shield size={10} className="text-indigo-400" />}
+            <div className="text-lg font-bold gradient-text leading-tight">NexTask</div>
+            <div className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+              {user?.role === 'admin' && <Shield size={10} className="text-green-500" />}
               <span className="capitalize">{user?.role}</span>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-600 hover:text-white transition-colors">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-slate-400 hover:text-slate-700 transition-colors">
             <X size={18} />
           </button>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          <div className="text-xs text-slate-700 uppercase tracking-widest font-medium mb-3 px-3 pt-1">Navigation</div>
+          <div className="text-xs text-slate-400 uppercase tracking-widest font-medium mb-3 px-3 pt-1">Navigation</div>
           {navItems.map(({ path, icon: Icon, label }) => {
             const active = location.pathname === path || (path !== '/dashboard' && location.pathname.startsWith(path));
             return (
@@ -106,16 +106,16 @@ export default function Layout({ children }) {
                   whileHover={{ x: 3 }}
                   whileTap={{ scale: 0.97 }}
                   className={`sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    active ? 'active text-indigo-300' : 'text-slate-400 hover:text-white'
+                    active ? 'active text-green-700' : 'text-slate-500 hover:text-slate-700'
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
-                    active ? 'bg-indigo-500/20' : 'bg-white/5'
+                    active ? 'bg-green-500/15' : 'bg-slate-100'
                   }`}>
-                    <Icon size={16} className={active ? 'text-indigo-400' : 'text-slate-500'} />
+                    <Icon size={16} className={active ? 'text-green-600' : 'text-slate-400'} />
                   </div>
                   <span>{label}</span>
-                  {active && <ChevronRight size={14} className="ml-auto text-indigo-500 opacity-70" />}
+                  {active && <ChevronRight size={14} className="ml-auto text-green-500 opacity-70" />}
                 </motion.div>
               </Link>
             );
@@ -123,10 +123,10 @@ export default function Layout({ children }) {
         </nav>
 
         {/* User card */}
-        <div className="p-3" style={{ borderTop: '1px solid rgba(99,102,241,0.12)' }}>
+        <div className="p-3" style={{ borderTop: '1px solid #bbf7d0' }}>
           <div
             className="flex items-center gap-3 p-3 rounded-xl"
-            style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.12)' }}
+            style={{ background: 'rgba(22,163,74,0.05)', border: '1px solid rgba(22,163,74,0.12)' }}
           >
             <Link to="/profile" onClick={() => setSidebarOpen(false)}>
               <div
@@ -137,13 +137,13 @@ export default function Layout({ children }) {
               </div>
             </Link>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
-              <div className="text-xs text-slate-600 capitalize">{user?.role}</div>
+              <div className="text-sm font-semibold text-slate-800 truncate">{user?.name}</div>
+              <div className="text-xs text-slate-400 capitalize">{user?.role}</div>
             </div>
             <button
               onClick={handleLogout}
               title="Logout"
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:text-red-400 hover:bg-red-500/10 transition-all"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all"
             >
               <LogOut size={14} />
             </button>
@@ -158,32 +158,33 @@ export default function Layout({ children }) {
         <header
           className="flex items-center gap-4 px-6 py-3.5 flex-shrink-0"
           style={{
-            background: 'rgba(10,10,20,0.85)',
+            background: 'rgba(255,255,255,0.92)',
             backdropFilter: 'blur(20px)',
-            borderBottom: '1px solid rgba(99,102,241,0.12)',
+            borderBottom: '1px solid #bbf7d0',
+            boxShadow: '0 1px 10px rgba(22,163,74,0.06)'
           }}
         >
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-slate-500 hover:text-white transition-colors"
+            className="lg:hidden text-slate-400 hover:text-slate-700 transition-colors"
           >
             <Menu size={20} />
           </button>
 
           {/* Page title */}
           <div className="flex-1">
-            <div className="text-slate-600 text-xs capitalize">
-              {location.pathname === '/profile' ? 'Account' : (currentNav?.label || 'WorkHive')}
+            <div className="text-slate-400 text-xs capitalize">
+              {location.pathname === '/profile' ? 'Account' : (currentNav?.label || 'NexTask')}
             </div>
-            <h1 className="text-white font-semibold text-base leading-tight">{pageTitle}</h1>
+            <h1 className="text-slate-800 font-semibold text-base leading-tight">{pageTitle}</h1>
           </div>
 
           {/* Right controls */}
           <div className="flex items-center gap-2">
             {/* Search bar */}
             <div
-              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-slate-500"
-              style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)', width: '180px' }}
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-slate-400 transition-all"
+              style={{ background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.15)', width: '180px' }}
             >
               <Search size={13} />
               <span className="text-xs">Search...</span>
@@ -193,8 +194,8 @@ export default function Layout({ children }) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:text-white transition-colors"
-              style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}
+              className="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 transition-colors"
+              style={{ background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.15)' }}
             >
               <Bell size={15} />
             </motion.button>

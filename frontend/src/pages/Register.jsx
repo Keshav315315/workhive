@@ -28,7 +28,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#050508' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: '#f0fdf4' }}>
       {/* Animated CSS blobs */}
       <div className="blob blob-1" />
       <div className="blob blob-2" />
@@ -49,13 +49,13 @@ export default function Register() {
           <div className="inline-flex items-center gap-3 mb-3">
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl pulse-glow"
-              style={{ background: 'linear-gradient(135deg, #6366f1, #f59e0b)' }}
+              style={{ background: 'linear-gradient(135deg, #16a34a, #0d9488)' }}
             >
-              🐝
+              ⚡
             </div>
-            <span className="text-3xl font-bold gradient-text">WorkHive</span>
+            <span className="text-3xl font-bold gradient-text">NexTask</span>
           </div>
-          <p className="text-slate-500 text-sm tracking-wide">Where Teams Thrive</p>
+          <p className="text-slate-500 text-sm tracking-wide">Next Level Productivity</p>
         </motion.div>
 
         {/* Card */}
@@ -64,22 +64,18 @@ export default function Register() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.45, delay: 0.1 }}
           className="glass-card rounded-2xl p-8 relative"
+          style={{ boxShadow: '0 25px 50px rgba(0,0,0,0.12), 0 10px 25px rgba(22,163,74,0.1)' }}
         >
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none"
-            style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.07) 0%, transparent 55%, rgba(245,158,11,0.04) 100%)' }}
-          />
-
           <div className="relative">
-            <h2 className="text-2xl font-bold text-white mb-1">Create account</h2>
-            <p className="text-slate-500 text-sm mb-6">Join your team on WorkHive</p>
+            <h2 className="text-2xl font-bold text-slate-900 mb-1">Create account</h2>
+            <p className="text-slate-500 text-sm mb-6">Join your team on NexTask</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-widest">Full Name</label>
+                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-widest">Full Name</label>
                 <div className="relative">
-                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     value={form.name}
@@ -93,9 +89,9 @@ export default function Register() {
 
               {/* Email */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-widest">Email</label>
+                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-widest">Email</label>
                 <div className="relative">
-                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="email"
                     value={form.email}
@@ -109,9 +105,9 @@ export default function Register() {
 
               {/* Password */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-widest">Password</label>
+                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-widest">Password</label>
                 <div className="relative">
-                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={form.password}
@@ -123,7 +119,7 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
@@ -132,7 +128,7 @@ export default function Register() {
 
               {/* Role */}
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-2 uppercase tracking-widest">Role</label>
+                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase tracking-widest">Role</label>
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     { value: 'admin', label: 'Admin', icon: Shield, desc: 'Full control' },
@@ -144,15 +140,15 @@ export default function Register() {
                       onClick={() => setForm({ ...form, role: value })}
                       className={`p-3 rounded-xl border text-left transition-all duration-200 ${
                         form.role === value
-                          ? 'border-indigo-500 text-white'
-                          : 'border-white/10 text-slate-400 hover:border-indigo-500/30'
+                          ? 'border-green-500 text-slate-900'
+                          : 'border-green-100 text-slate-500 hover:border-green-300'
                       }`}
                       style={form.role === value ? {
-                        background: 'rgba(99,102,241,0.15)',
-                        boxShadow: '0 0 15px rgba(99,102,241,0.2)'
-                      } : { background: 'rgba(255,255,255,0.03)' }}
+                        background: 'rgba(22,163,74,0.08)',
+                        boxShadow: '0 0 15px rgba(22,163,74,0.12)'
+                      } : { background: '#f8fafc' }}
                     >
-                      <Icon size={15} className="mb-1 text-indigo-400" />
+                      <Icon size={15} className="mb-1 text-green-600" />
                       <div className="text-xs font-semibold">{label}</div>
                       <div className="text-xs opacity-50">{desc}</div>
                     </button>
@@ -167,7 +163,7 @@ export default function Register() {
                 className="btn-primary w-full rounded-xl py-3 text-white font-semibold text-sm flex items-center justify-center gap-2 mt-2"
               >
                 {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>Create account <ArrowRight size={16} /></>
                 )}
@@ -177,7 +173,7 @@ export default function Register() {
             <div className="mt-6 text-center">
               <p className="text-slate-500 text-sm">
                 Already have an account?{' '}
-                <Link to="/login" className="text-indigo-400 hover:text-amber-400 font-medium transition-colors duration-200">
+                <Link to="/login" className="text-green-600 hover:text-teal-600 font-medium transition-colors duration-200">
                   Sign in
                 </Link>
               </p>

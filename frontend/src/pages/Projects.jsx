@@ -10,11 +10,11 @@ import toast from 'react-hot-toast';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
-const PROJECT_COLORS = ['#6366f1','#f59e0b','#10b981','#ec4899','#06b6d4','#8b5cf6','#ef4444','#84cc16'];
+const PROJECT_COLORS = ['#16a34a','#0d9488','#f59e0b','#ec4899','#8b5cf6','#ef4444','#0284c7','#84cc16'];
 
 /* ─── Project Modal ──────────────────────────────────────────── */
 function ProjectModal({ onClose, onSave, users }) {
-  const [form, setForm] = useState({ name: '', description: '', color: '#6366f1', deadline: '', members: [] });
+  const [form, setForm] = useState({ name: '', description: '', color: '#16a34a', deadline: '', members: [] });
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -34,17 +34,17 @@ function ProjectModal({ onClose, onSave, users }) {
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={e => e.target === e.currentTarget && onClose()}
     >
       <motion.div
         initial={{ scale: 0.92, y: 24 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 24 }}
         className="glass-card rounded-2xl p-6 w-full max-w-md"
-        style={{ boxShadow: '0 0 60px rgba(99,102,241,0.2), 0 20px 40px rgba(0,0,0,0.5)' }}
+        style={{ boxShadow: '0 25px 50px rgba(0,0,0,0.15), 0 0 40px rgba(22,163,74,0.1)' }}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-white">New Project</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-600 hover:text-white hover:bg-white/5 transition-all">
+          <h3 className="text-lg font-bold text-slate-900">New Project</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all">
             <X size={17} />
           </button>
         </div>
@@ -83,7 +83,7 @@ function ProjectModal({ onClose, onSave, users }) {
           <div>
             <label className={labelCls}>Deadline</label>
             <input type="date" value={form.deadline} onChange={e => setForm({ ...form, deadline: e.target.value })}
-              className="input-glass w-full rounded-xl px-4 py-3 text-sm" style={{ colorScheme: 'dark' }} />
+              className="input-glass w-full rounded-xl px-4 py-3 text-sm" />
           </div>
 
           {users.length > 0 && (
@@ -92,8 +92,8 @@ function ProjectModal({ onClose, onSave, users }) {
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {users.map(u => (
                   <label key={u._id}
-                    className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all"
-                    style={{ background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.1)' }}
+                    className="flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all hover:bg-green-50"
+                    style={{ background: 'rgba(22,163,74,0.04)', border: '1px solid rgba(22,163,74,0.1)' }}
                   >
                     <input type="checkbox" checked={form.members.includes(u._id)}
                       onChange={e => setForm({
@@ -102,10 +102,10 @@ function ProjectModal({ onClose, onSave, users }) {
                           ? [...form.members, u._id]
                           : form.members.filter(id => id !== u._id)
                       })}
-                      className="accent-indigo-500"
+                      className="accent-green-600"
                     />
-                    <span className="text-sm text-slate-300">{u.name}</span>
-                    <span className="text-xs text-slate-600 capitalize ml-auto">{u.role}</span>
+                    <span className="text-sm text-slate-700">{u.name}</span>
+                    <span className="text-xs text-slate-400 capitalize ml-auto">{u.role}</span>
                   </label>
                 ))}
               </div>
@@ -114,8 +114,8 @@ function ProjectModal({ onClose, onSave, users }) {
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose}
-              className="flex-1 py-2.5 rounded-xl text-slate-400 text-sm hover:text-white transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(99,102,241,0.15)' }}>
+              className="flex-1 py-2.5 rounded-xl text-slate-500 text-sm hover:text-slate-700 transition-all"
+              style={{ background: '#f8fafc', border: '1px solid #bbf7d0' }}>
               Cancel
             </button>
             <button type="submit" disabled={saving}
@@ -178,7 +178,7 @@ export default function Projects() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-2 border-indigo-500/25 border-t-indigo-500 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-2 border-green-500/25 border-t-green-500 rounded-full animate-spin" />
     </div>
   );
 
@@ -187,10 +187,10 @@ export default function Projects() {
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <p className="text-slate-600 text-sm">{projects.length} project{projects.length !== 1 ? 's' : ''}</p>
+        <p className="text-slate-500 text-sm">{projects.length} project{projects.length !== 1 ? 's' : ''}</p>
         <div className="flex gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:w-64">
-            <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600" />
+            <Search size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search projects..." className="input-glass w-full rounded-xl pl-9 pr-4 py-2.5 text-sm" />
           </div>
@@ -210,16 +210,16 @@ export default function Projects() {
       {filtered.length === 0 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
           className="flex flex-col items-center justify-center h-64 glass-card rounded-2xl">
-          <FolderKanban size={44} className="text-indigo-500/30 mb-4" />
-          <p className="text-slate-400 font-medium">
+          <FolderKanban size={44} className="text-green-500/30 mb-4" />
+          <p className="text-slate-500 font-medium">
             {search ? 'No projects match your search' : 'No projects yet'}
           </p>
-          <p className="text-slate-600 text-sm mt-1">
+          <p className="text-slate-400 text-sm mt-1">
             {!search && 'Create your first project to get started'}
           </p>
           {!search && user?.role === 'admin' && (
             <button onClick={() => setShowModal(true)}
-              className="mt-4 text-sm text-indigo-400 hover:text-amber-400 transition-colors">
+              className="mt-4 text-sm text-green-600 hover:text-teal-600 transition-colors">
               + Create project
             </button>
           )}
@@ -227,16 +227,15 @@ export default function Projects() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {filtered.map((project, i) => {
-            const color = project.color || '#6366f1';
+            const color = project.color || '#16a34a';
             return (
               <motion.div
                 key={project._id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.07 }}
-                whileHover={{ y: -4 }}
                 className="glass-card card-shine rounded-2xl overflow-hidden group relative card-hover"
-                style={{ boxShadow: `0 0 20px ${color}18, 0 8px 20px rgba(0,0,0,0.25)` }}
+                style={{ boxShadow: `0 4px 20px ${color}18, 0 1px 4px rgba(0,0,0,0.05)` }}
               >
                 {/* Gradient top accent */}
                 <div className="h-1" style={{ background: `linear-gradient(90deg, ${color}, ${color}60, transparent)` }} />
@@ -250,7 +249,7 @@ export default function Projects() {
                     {project.owner._id === user._id && (
                       <button
                         onClick={e => handleDelete(project._id, e)}
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-700 hover:text-red-400 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-all"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -258,15 +257,15 @@ export default function Projects() {
                   </div>
 
                   <Link to={`/projects/${project._id}`}>
-                    <h3 className="text-white font-semibold text-base mb-1 hover:text-indigo-300 transition-colors truncate">
+                    <h3 className="text-slate-900 font-semibold text-base mb-1 hover:text-green-700 transition-colors truncate">
                       {project.name}
                     </h3>
                   </Link>
                   {project.description && (
-                    <p className="text-slate-600 text-xs line-clamp-2 mb-3">{project.description}</p>
+                    <p className="text-slate-400 text-xs line-clamp-2 mb-3">{project.description}</p>
                   )}
 
-                  <div className="flex items-center gap-3 text-xs text-slate-600 mt-3">
+                  <div className="flex items-center gap-3 text-xs text-slate-400 mt-3">
                     <div className="flex items-center gap-1">
                       <Users size={11} />
                       <span>{(project.members?.length || 0) + 1} members</span>
@@ -287,7 +286,7 @@ export default function Projects() {
 
                   <Link to={`/projects/${project._id}`}>
                     <div className="mt-4 pt-3 flex items-center text-xs font-medium transition-colors"
-                      style={{ borderTop: '1px solid rgba(99,102,241,0.1)', color }}>
+                      style={{ borderTop: '1px solid rgba(22,163,74,0.1)', color }}>
                       View project <ChevronRight size={13} className="ml-auto" />
                     </div>
                   </Link>

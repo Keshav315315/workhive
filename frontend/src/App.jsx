@@ -17,7 +17,7 @@ const PrivateRoute = ({ children }) => {
     return (
       <div className="min-h-screen animated-gradient flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-2 border-indigo-500/25 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-2 border-green-500/25 border-t-green-500 rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-500 text-sm">Loading...</p>
         </div>
       </div>
@@ -59,17 +59,16 @@ export default function App() {
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#0f0f1a',
-            color: '#f1f5f9',
-            border: '1px solid rgba(99,102,241,0.25)',
+            background: '#ffffff',
+            color: '#0f172a',
+            border: '1px solid #bbf7d0',
             borderRadius: '14px',
             fontSize: '13px',
             fontFamily: 'Poppins, sans-serif',
-            backdropFilter: 'blur(20px)',
-            boxShadow: '0 0 30px rgba(99,102,241,0.12), 0 8px 20px rgba(0,0,0,0.4)',
+            boxShadow: '0 10px 30px rgba(22,163,74,0.12), 0 4px 10px rgba(0,0,0,0.06)',
           },
-          success: { iconTheme: { primary: '#10b981', secondary: '#0f0f1a' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#0f0f1a' } },
+          success: { iconTheme: { primary: '#16a34a', secondary: '#ffffff' } },
+          error: { iconTheme: { primary: '#ef4444', secondary: '#ffffff' } },
         }}
       />
     </AuthProvider>
