@@ -1,12 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Allow all origins (required for Railway + any external clients)
+app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'] }));
+
 app.use(express.json());
+
+// Prevent browsers from caching API responses (fixes 304 stale-auth issues)
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
 
 // API routes
 app.use('/api/auth', require('./routes/auth'));
