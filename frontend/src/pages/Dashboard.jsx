@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckSquare, Clock, AlertTriangle, FolderKanban,
   TrendingUp, ArrowUpRight, Plus, Calendar, Users, Shield,
   UserCheck, BarChart3, Zap, FileText, CheckCircle2, Activity
 } from 'lucide-react';
-import { format, isBefore, formatDistanceToNow } from 'date-fns';
+import { format, isBefore, formatDistanceToNow, isToday } from 'date-fns';
 import api from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -482,98 +482,324 @@ function AdminDashboard({ user, stats, recentTasks, projects, onNewTask }) {
   );
 }
 
+/* ─── Member Task Card ────────────────────────────────────────── */
+const PRIORITY_BORDER_COLOR = { critical: '#ef4444', high: '#f97316', medium: '#f59e0b', low: '#16a34a' };
+const STATUS_NEXT = { todo: 'in-progress', 'in-progress': 'review', review: 'done', done: 'todo' };
+const STATUS_LABELS = { todo: 'To Do', 'in-progress': 'In Progress', review: 'Review', done: 'Done' };
+const STATUS_STYLE = {
+  done:         { bg: 'rgba(13,148,136,0.08)',   color: '#0d9488'  },
+  'in-progress':{ bg: 'rgba(22,163,74,0.08)',    color: '#16a34a'  },
+  review:       { bg: 'rgba(245,158,11,0.08)',   color: '#d97706'  },
+  todo:         { bg: 'rgba(100,116,139,0.08)',  color: '#64748b'  },
+};
+
+function MemberTaskCard({ task, onStatusChange }) {
+  const [changing, setChanging] = useState(false);
+  const due = task.dueDate ? new Date(task.dueDate) : null;
+  const overdue = due && isBefore(due, new Date()) && task.status !== 'done';
+  const dueToday = due && isToday(due);
+  const border = PRIORITY_BORDER_COLOR[task.priority] || '#64748b';
+  const ss = STATUS_STYLE[task.status] || STATUS_STYLE.todo;
+
+  const handleQuick = async (e) => {
+    e.stopPropagation();
+    setChanging(true);
+    await onStatusChange(task._id, STATUS_NEXT[task.status]);
+    setChanging(false);
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -3, boxShadow: '0 8px 24px rgba(22,163,74,0.12)' }}
+      className="rounded-xl p-3.5"
+      style={{
+        background: overdue ? 'rgba(239,68,68,0.04)' : '#ffffff',
+        border: `1px solid ${overdue ? 'rgba(239,68,68,0.2)' : '#e2e8f0'}`,
+        borderLeft: `4px solid ${border}`,
+        transition: 'all 0.2s ease',
+      }}
+    >
+      <div className="flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-1">
+            {overdue && <span className="text-xs leading-none">⚠️</span>}
+            <p className={`text-sm font-medium leading-snug ${task.status === 'done' ? 'line-through text-slate-400' : 'text-slate-800'}`}>
+              {task.title}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap mt-1">
+            {task.project?.name && (
+              <span className="text-xs text-slate-400 flex items-center gap-1">
+                <FolderKanban size={9} /> {task.project.name}
+              </span>
+            )}
+            {due && (
+              <span className={`text-xs flex items-center gap-1 font-medium ${overdue ? 'text-red-500' : dueToday ? 'text-amber-500' : 'text-slate-400'}`}>
+                <Calendar size={9} />
+                {overdue ? 'Overdue · ' : dueToday ? 'Today · ' : ''}
+                {format(due, 'MMM d')}
+              </span>
+            )}
+            <span className={`text-xs px-1.5 py-0.5 rounded-md font-medium priority-${task.priority}`}>
+              {task.priority}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-2 flex-shrink-0">
+          <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: ss.bg, color: ss.color }}>
+            {STATUS_LABELS[task.status]}
+          </span>
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={handleQuick}
+            disabled={changing}
+            className="text-xs px-2.5 py-1 rounded-lg font-medium transition-all"
+            style={{ background: 'rgba(22,163,74,0.08)', color: '#16a34a', border: '1px solid rgba(22,163,74,0.2)' }}
+          >
+            {changing ? '…' : task.status === 'done' ? '↩ Reopen' : '→ Next'}
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 /* ─── Member Dashboard ────────────────────────────────────────── */
-function MemberDashboard({ user, stats, recentTasks, projects }) {
+const QUOTES = [
+  "Let's crush it today! 💪",
+  "Every task completed is progress made! 🚀",
+  "Focus on progress, not perfection. ✨",
+  "Small steps lead to big wins! 🏆",
+  "You've got this! Make today count. 🔥",
+  "Productivity is the key to success! ⚡",
+];
+
+function MemberDashboard({ user, stats, recentTasks: initialTasks, projects }) {
+  const [tasks, setTasks] = useState(initialTasks);
+  useEffect(() => { setTasks(initialTasks); }, [initialTasks]);
+
   const completionRate = stats.total ? Math.round((stats.done / stats.total) * 100) : 0;
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+  const firstName = user?.name?.split(' ')[0] || 'there';
+  const quote = QUOTES[new Date().getDay() % QUOTES.length];
+  const pendingCount = stats.total - stats.done;
+
+  const motivationalMsg =
+    completionRate === 0 ? "Let's get started! 🚀" :
+    completionRate < 50  ? 'Keep going! 💪' :
+    completionRate < 100 ? 'Almost there! 🔥' : 'All done! 🎉';
+
+  const upcomingDeadlines = [...tasks]
+    .filter(t => t.dueDate && t.status !== 'done')
+    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+    .slice(0, 3);
+
+  const handleStatusChange = async (taskId, newStatus) => {
+    try {
+      const res = await api.patch(`/tasks/${taskId}`, { status: newStatus });
+      setTasks(prev => prev.map(t => t._id === taskId ? res.data : t));
+      toast.success('Task updated!');
+    } catch {
+      toast.error('Failed to update task');
+    }
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start justify-between flex-wrap gap-3">
+
+      {/* ── 1. WELCOME ──────────────────────────────────────────── */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">
-            Good {greeting},{' '}
-            <span className="gradient-text">{user?.name?.split(' ')[0]}</span> ⚡
+          <h2 className="text-3xl font-bold" style={{
+            background: 'linear-gradient(135deg,#0f172a 0%,#16a34a 55%,#0d9488 100%)',
+            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+          }}>
+            Good {greeting}, {firstName} ⚡
           </h2>
-          <p className="text-slate-400 text-sm mt-1">
-            {format(new Date(), 'EEEE, MMMM d, yyyy')} •{' '}
-            {stats.overdue > 0
-              ? <span className="text-red-500">{stats.overdue} overdue task{stats.overdue !== 1 ? 's' : ''}</span>
-              : 'All tasks on track'}
-          </p>
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <p className="text-slate-400 text-sm">{format(new Date(), 'EEEE, MMMM d, yyyy')}</p>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full"
+              style={{ background: 'rgba(22,163,74,0.1)', color: '#16a34a', border: '1px solid rgba(22,163,74,0.2)' }}>
+              Member
+            </span>
+          </div>
+          <p className="text-sm text-slate-500 mt-1 italic">{quote}</p>
+        </div>
+
+        {/* Quick Actions Bar */}
+        <div className="flex gap-2 flex-wrap">
+          {[
+            { label: '📋 My Tasks',      to: '/tasks'     },
+            { label: '📁 My Projects',   to: '/projects'  },
+            { label: '✅ Mark Complete',  action: () => toast('Select a task below and click → Next', { icon: '💡' }) },
+            { label: '🔔 Reminders',     action: () => toast('Reminders coming soon!') },
+          ].map(({ label, to, action }) => {
+            const btn = (
+              <motion.button
+                key={label}
+                whileHover={{ y: -2, boxShadow: '0 4px 14px rgba(22,163,74,0.18)' }}
+                whileTap={{ scale: 0.97 }}
+                onClick={action}
+                className="text-sm px-4 py-2 rounded-full font-medium transition-all"
+                style={{ background: 'rgba(22,163,74,0.06)', border: '1px solid rgba(22,163,74,0.28)', color: '#16a34a' }}
+              >
+                {label}
+              </motion.button>
+            );
+            return to ? <Link key={label} to={to}>{btn}</Link> : <span key={label}>{btn}</span>;
+          })}
         </div>
       </motion.div>
 
+      {/* ── 2. STAT CARDS ───────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="My Tasks" value={stats.total} icon={UserCheck}
-          iconColor="text-green-600" iconBg="bg-green-500/10"
-          accentHex="#16a34a" delay={0.05} />
+        <StatCard label="My Tasks"   value={stats.total}      icon={CheckSquare}
+          iconColor="text-green-600"   iconBg="bg-green-500/10"
+          accentHex="#16a34a"  sub={`${pendingCount} pending`}                   delay={0.05} to="/tasks" />
         <StatCard label="In Progress" value={stats.inProgress} icon={Clock}
-          iconColor="text-amber-500" iconBg="bg-amber-500/10"
-          accentHex="#f59e0b" delay={0.1} />
-        <StatCard label="Completed" value={stats.done} icon={TrendingUp}
-          iconColor="text-teal-600" iconBg="bg-teal-500/10"
-          accentHex="#0d9488" delay={0.15} />
-        <StatCard label="Overdue" value={stats.overdue} icon={AlertTriangle}
-          iconColor="text-red-500" iconBg="bg-red-500/10"
-          accentHex="#ef4444" delay={0.2} />
+          iconColor="text-amber-500"   iconBg="bg-amber-500/10"
+          accentHex="#f59e0b"  sub="Active now"                                   delay={0.1} />
+        <StatCard label="Completed"  value={stats.done}        icon={CheckCircle2}
+          iconColor="text-emerald-600" iconBg="bg-emerald-500/10"
+          accentHex="#10b981"  sub="Tasks done ✓"                                 delay={0.15} />
+        <StatCard label="Overdue"    value={stats.overdue}     icon={AlertTriangle}
+          iconColor="text-red-500"     iconBg="bg-red-500/10"
+          accentHex="#ef4444"  sub={stats.overdue > 0 ? '⚠️ Urgent!' : 'All on track'} delay={0.2} />
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-        <Panel>
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <div className="text-slate-800 font-semibold">My Progress</div>
-              <div className="text-slate-400 text-xs mt-0.5">{stats.done} of {stats.total} tasks completed</div>
-            </div>
-            <div className="text-2xl font-bold gradient-text">{completionRate}%</div>
-          </div>
-          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(22,163,74,0.1)' }}>
-            <motion.div initial={{ width: 0 }} animate={{ width: `${completionRate}%` }}
-              transition={{ duration: 1, delay: 0.5, ease: 'easeOut' }}
-              className="h-full progress-bar rounded-full" />
-          </div>
-          <div className="flex gap-4 mt-3 flex-wrap">
-            {[
-              { label: 'To Do', value: stats.todo, color: '#64748b' },
-              { label: 'In Progress', value: stats.inProgress, color: '#16a34a' },
-              { label: 'Review', value: stats.review || 0, color: '#f59e0b' },
-              { label: 'Done', value: stats.done, color: '#0d9488' },
-            ].map(({ label, value, color }) => (
-              <div key={label} className="flex items-center gap-1.5 text-xs text-slate-400">
-                <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                {label}: <span className="text-slate-700 font-medium">{value}</span>
-              </div>
-            ))}
-          </div>
-        </Panel>
-      </motion.div>
+      {/* ── 3. MY PROGRESS + UPCOMING DEADLINES ─────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}>
-          <Panel>
-            <PanelTitle icon={CheckSquare} iconColor="text-green-600" action={<ViewAll to="/tasks" />}>
-              My Recent Tasks
-            </PanelTitle>
-            {recentTasks.length === 0
-              ? <EmptyState icon={CheckSquare} text="No tasks assigned to you yet." />
-              : <div className="space-y-2">{recentTasks.map(t => <TaskItem key={t._id} task={t} />)}</div>
-            }
+        {/* Progress Ring */}
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
+          className="xl:col-span-2">
+          <Panel className="h-full">
+            <PanelTitle icon={BarChart3} iconColor="text-green-600">My Progress</PanelTitle>
+            <div className="flex items-center gap-8 flex-wrap">
+              <div className="flex flex-col items-center flex-shrink-0">
+                <CircularProgress percentage={completionRate} />
+                <p className="text-sm font-semibold mt-2 text-center" style={{ color: '#16a34a' }}>
+                  {motivationalMsg}
+                </p>
+              </div>
+              <div className="flex-1 min-w-[160px] space-y-3">
+                {[
+                  { label: 'To Do',        value: stats.todo,              color: '#64748b', bg: 'rgba(100,116,139,0.1)' },
+                  { label: 'In Progress',  value: stats.inProgress,        color: '#16a34a', bg: 'rgba(22,163,74,0.1)'   },
+                  { label: 'In Review',    value: stats.review || 0,       color: '#f59e0b', bg: 'rgba(245,158,11,0.1)'  },
+                  { label: 'Done',         value: stats.done,              color: '#0d9488', bg: 'rgba(13,148,136,0.1)'  },
+                ].map(({ label, value, color, bg }) => {
+                  const pct = stats.total ? Math.round((value / stats.total) * 100) : 0;
+                  return (
+                    <div key={label}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="flex items-center gap-1.5 text-slate-500">
+                          <span className="w-2 h-2 rounded-full inline-block flex-shrink-0" style={{ background: color }} />
+                          {label}
+                        </span>
+                        <span className="font-semibold text-slate-700">{value}</span>
+                      </div>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: bg }}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          transition={{ duration: 0.8, delay: 0.5, ease: 'easeOut' }}
+                          className="h-full rounded-full"
+                          style={{ background: color }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </Panel>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
+        {/* Upcoming Deadlines Widget */}
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}>
+          <Panel className="h-full">
+            <PanelTitle icon={Calendar} iconColor="text-amber-500">Upcoming Deadlines</PanelTitle>
+            {upcomingDeadlines.length === 0 ? (
+              <EmptyState icon={Calendar} text="No upcoming deadlines" sub="You're all clear! 🎉" />
+            ) : (
+              <div className="space-y-3">
+                {upcomingDeadlines.map((t, i) => {
+                  const due = new Date(t.dueDate);
+                  const over  = isBefore(due, new Date());
+                  const today = isToday(due);
+                  const dotColor  = over ? '#ef4444' : today ? '#f59e0b' : '#16a34a';
+                  const bgColor   = over ? 'rgba(239,68,68,0.04)' : today ? 'rgba(245,158,11,0.04)' : 'rgba(22,163,74,0.04)';
+                  const bdrColor  = over ? 'rgba(239,68,68,0.2)'  : today ? 'rgba(245,158,11,0.2)'  : 'rgba(22,163,74,0.2)';
+                  return (
+                    <motion.div key={t._id}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.35 + i * 0.06 }}
+                      className="flex items-start gap-3 p-3 rounded-xl"
+                      style={{ background: bgColor, border: `1px solid ${bdrColor}` }}
+                    >
+                      <div className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5" style={{ background: dotColor }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-slate-800 leading-snug truncate">{t.title}</p>
+                        <p className="text-xs mt-0.5 font-medium" style={{ color: dotColor }}>
+                          {over ? '⚠️ Overdue · ' : today ? '📅 Due today · ' : ''}
+                          {format(due, 'MMM d, yyyy')}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </Panel>
+        </motion.div>
+      </div>
+
+      {/* ── 4. MY TASKS + MY PROJECTS ───────────────────────────── */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        {/* My Tasks */}
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }}>
+          <Panel>
+            <PanelTitle icon={CheckSquare} iconColor="text-green-600" action={<ViewAll to="/tasks" />}>
+              My Tasks
+            </PanelTitle>
+            {tasks.length === 0 ? (
+              <div className="text-center py-10">
+                <div className="text-5xl mb-3">🎉</div>
+                <p className="text-slate-600 text-sm font-semibold">No tasks yet! Enjoy your day 🎉</p>
+                <p className="text-slate-400 text-xs mt-1">Tasks assigned to you will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <AnimatePresence mode="popLayout">
+                  {tasks.map(t => (
+                    <MemberTaskCard key={t._id} task={t} onStatusChange={handleStatusChange} />
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </Panel>
+        </motion.div>
+
+        {/* My Projects */}
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.45 }}>
           <Panel>
             <PanelTitle icon={FolderKanban} iconColor="text-amber-500" action={<ViewAll to="/projects" />}>
               My Projects
             </PanelTitle>
-            {projects.length === 0
-              ? <EmptyState icon={FolderKanban} text="You're not in any projects yet." />
-              : <div className="grid grid-cols-2 gap-3">
-                  {projects.map((p, i) => <ProjectCard key={p._id} project={p} index={i} />)}
-                </div>
-            }
+            {projects.length === 0 ? (
+              <EmptyState icon={FolderKanban} text="You're not in any projects yet." />
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {projects.map((p, i) => <ProjectCard key={p._id} project={p} index={i} />)}
+              </div>
+            )}
           </Panel>
         </motion.div>
       </div>
