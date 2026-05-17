@@ -15,19 +15,22 @@ app.use('/api/projects', require('./routes/projects'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Server running' }));
 
-// Serve React frontend (no CORS needed — same origin)
+// Serve React frontend
 const frontendDist = path.join(__dirname, 'public');
-app.use(express.static(frontendDist));
-app.use((req, res) => {
+app.use(express.static(frontendDist, { index: 'index.html' }));
+app.get('*', (req, res) => {
   res.sendFile(path.join(frontendDist, 'index.html'));
 });
 
+// Start server immediately — don't wait for DB
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on 0.0.0.0:${PORT}`);
+});
+
+// Connect to MongoDB separately so a slow DB doesn't block startup
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server on port ${PORT}`));
-  })
+  .then(() => console.log('MongoDB connected'))
   .catch(err => {
-    console.error('MongoDB error:', err);
-    process.exit(1);
+    console.error('MongoDB connection error:', err.message);
+    // Don't exit — let Railway health check pass; DB may recover
   });
